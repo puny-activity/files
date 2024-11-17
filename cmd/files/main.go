@@ -1,11 +1,10 @@
 package main
 
 import (
-	"context"
 	"github.com/puny-activity/files/cfg"
 	"github.com/puny-activity/files/internal/app"
 	"github.com/puny-activity/files/pkg/lggr"
-	"log/slog"
+	"github.com/puny-activity/files/pkg/werr"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,9 +13,7 @@ import (
 func main() {
 	config, err := cfg.Parse()
 	if err != nil {
-		slog.LogAttrs(context.Background(), slog.LevelError, "failed to read config",
-			slog.String("error", err.Error()))
-		panic(err)
+		panic(werr.Wrap("failed to read config", err))
 	}
 
 	logger := lggr.New(config.Logger)
@@ -25,14 +22,12 @@ func main() {
 	application := app.New(logger)
 	err = application.Start()
 	if err != nil {
-		logger.LogAttrs(context.Background(), slog.LevelError, "failed to start application",
-			slog.String("error", err.Error()))
-		panic(err)
+		panic(werr.Wrap("failed to start application", err))
 	}
 	defer func() {
 		err := application.Stop()
 		if err != nil {
-			logger.Error("failed to stop application", "error", err)
+			logger.Warn("failed to stop application", "error", err)
 		}
 	}()
 
