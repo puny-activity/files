@@ -1,3 +1,6 @@
 package base
 
-const ActionID = "actionId"
+const (
+	CtxActionID    = "actionId"
+	CtxRequesterID = "requesterId"
+)
